@@ -1,379 +1,831 @@
 # Rentify
-Backend Setup
+Frontend: React, HTML, CSS
+Frontend Setup
 # Initialize the Project:
-mkdir rentify-backend
-cd rentify-backend
-npm init -y
-npm install express mongoose bcryptjs jsonwebtoken dotenv cors
-npm install --save-dev nodemon
+npx create-react-app rentify-frontend
+cd rentify-frontend
+npm install axios react-router-dom
 # Project Structure:
-rentify-backend/
-├── config/
-│   └── db.js
-├── controllers/
-│   ├── authController.js
-│   ├── propertyController.js
-│   └── userController.js
-├── middleware/
-│   └── auth.js
-├── models/
-│   ├── User.js
-│   └── Property.js
-├── routes/
-│   ├── authRoutes.js
-│   ├── propertyRoutes.js
-│   └── userRoutes.js
+css
+rentify-frontend/
+├── public/
+├── src/
+│   ├── components/
+│   │   ├── Auth/
+│   │   │   ├── Login.js
+│   │   │   └── Register.js
+│   │   ├── Layout/
+│   │   │   ├── Header.js
+│   │   │   └── Footer.js
+│   │   ├── Properties/
+│   │   │   ├── PropertyList.js
+│   │   │   ├── PropertyDetails.js
+│   │   │   ├── AddProperty.js
+│   │   │   └── EditProperty.js
+│   │   ├── Dashboard.js
+│   │   ├── Home.js
+│   │   └── Profile.js
+│   ├── api/
+│   │   └── api.js
+│   ├── App.css
+│   ├── App.js
+│   ├── index.js
+│   └── setupProxy.js
 ├── .env
-├── server.js
 └── package.json
 # Environment Variables:
+REACT_APP_API_URL=http://rentifysever:5000/api
 
-PORT=3000
-MONGO_URI=Rentify_database
-JWT_SECRET=rentify_secret_key
-# Database Configuration:
+# API Setup
+import axios from 'axios';
 
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+const API = axios.create({ baseURL: process.env.REACT_APP_API_URL });
 
-dotenv.config();
-
-const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-        console.log('MongoDB connected');
-    } catch (error) {
-        console.error(error.message);
-        process.exit(1);
+API.interceptors.request.use((req) => {
+    if (localStorage.getItem('token')) {
+        req.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
     }
-};
-
-module.exports = connectDB;
-# User Model:
-
-
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-
-const UserSchema = new mongoose.Schema({
-    firstName: {
-        type: String,
-        required: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    phone: {
-        type: String,
-        required: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
+    return req;
 });
 
-UserSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) {
-        return next();
-    }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-});
+export const register = (formData) => API.post('/users/register', formData);
+export const login = (formData) => API.post('/users/login', formData);
+export const getProfile = () => API.get('/users/profile');
 
-UserSchema.methods.matchPassword = async function (enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
+export const createProperty = (formData) => API.post('/properties', formData);
+export const getProperties = () => API.get('/properties');
+export const getProperty = (id) => API.get(`/properties/${id}`);
+export const updateProperty = (id, formData) => API.put(`/properties/${id}`, formData);
+export const deleteProperty = (id) => API.delete(`/properties/${id}`);
+export const likeProperty = (id) => API.post(`/properties/${id}/like`);
+# Setup Proxy:
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+module.exports = function (app) {
+    app.use(
+        '/api',
+        createProxyMiddleware({
+            target: 'http://localhost:5000',
+            changeOrigin: true,
+        })
+    );
 };
+# App Component:
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Home from './components/Home';
+import Login from './components/Auth/Login';
+import Register from './components/Auth/Register';
+import Dashboard from './components/Dashboard';
+import Profile from './components/Profile';
+import PropertyList from './components/Properties/PropertyList';
+import PropertyDetails from './components/Properties/PropertyDetails';
+import AddProperty from './components/Properties/AddProperty';
+import EditProperty from './components/Properties/EditProperty';
+import Header from './components/Layout/Header';
+import Footer from './components/Layout/Footer';
 
-const User = mongoose.model('User', UserSchema);
-
-module.exports = User;
-# Property Model:
-const mongoose = require('mongoose');
-
-const PropertySchema = new mongoose.Schema({
-    place: {
-        type: String,
-        required: true,
-    },
-    area: {
-        type: String,
-        required: true,
-    },
-    bedrooms: {
-        type: Number,
-        required: true,
-    },
-    bathrooms: {
-        type: Number,
-        required: true,
-    },
-    nearbyHospitals: {
-        type: String,
-        required: false,
-    },
-    nearbyColleges: {
-        type: String,
-        required: false,
-    },
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-    },
-    likes: {
-        type: Number,
-        default: 0,
-    },
-});
-
-const Property = mongoose.model('Property', PropertySchema);
-
-module.exports = Property;
-# Auth Middleware:
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-const auth = async (req, res, next) => {
-    const token = req.header('Authorization').replace('Bearer ', '');
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id);
-
-        if (!user) {
-            return res.status(401).json({ message: 'Not authorized' });
-        }
-
-        req.user = user;
-        next();
-    } catch (error) {
-        res.status(401).json({ message: 'Not authorized' });
-    }
-};
-
-module.exports = auth;
-# Auth Controller:
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-};
-
-exports.register = async (req, res) => {
-    const { firstName, lastName, email, phone, password } = req.body;
-
-    try {
-        const user = await User.create({
-            firstName,
-            lastName,
-            email,
-            phone,
-            password,
-        });
-
-        res.status(201).json({
-            token: generateToken(user._id),
-        });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-exports.login = async (req, res) => {
-    const { email, password } = req.body;
-
-    try {
-        const user = await User.findOne({ email });
-
-        if (user && (await user.matchPassword(password))) {
-            res.json({
-                token: generateToken(user._id),
-            });
-        } else {
-            res.status(401).json({ message: 'Invalid email or password' });
-        }
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-# User Controller: 
-const User = require('../models/User');
-
-exports.getUserProfile = async (req, res) => {
-    try {
-        const user = await User.findById(req.user._id);
-        res.json(user);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-# Property Controller:
-const Property = require('../models/Property');
-
-exports.createProperty = async (req, res) => {
-    const { place, area, bedrooms, bathrooms, nearbyHospitals, nearbyColleges } = req.body;
-
-    try {
-        const property = await Property.create({
-            place,
-            area,
-            bedrooms,
-            bathrooms,
-            nearbyHospitals,
-            nearbyColleges,
-            user: req.user._id,
-        });
-
-        res.status(201).json(property);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-exports.getProperties = async (req, res) => {
-    try {
-        const properties = await Property.find().populate('user', 'firstName lastName email phone');
-        res.json(properties);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-exports.getProperty = async (req, res) => {
-    try {
-        const property = await Property.findById(req.params.id).populate('user', 'firstName lastName email phone');
-        res.json(property);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-exports.updateProperty = async (req, res) => {
-    try {
-        const property = await Property.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.json(property);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-exports.deleteProperty = async (req, res) => {
-    try {
-        await Property.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Property deleted' });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-exports.likeProperty = async (req, res) => {
-    try {
-        const property = await Property.findById(req.params.id);
-        property.likes += 1;
-        await property.save();
-        res.json(property);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-# Auth Routes:
-const express = require('express');
-const { register, login } = require('../controllers/authController');
-
-const router = express.Router();
-
-router.post('/register', register);
-router.post('/login', login);
-
-module.exports = router;
-# User Routes:
-const express = require('express');
-const { getUserProfile } = require('../controllers/userController');
-const auth = require('../middleware/auth');
-
-const router = express.Router();
-
-router.get('/profile', auth, getUserProfile);
-
-module.exports = router;
-# Property Routes:
-const express = require('express');
-const {
-    createProperty,
-    getProperties,
-    getProperty,
-    updateProperty,
-    deleteProperty,
-    likeProperty,
-} = require('../controllers/propertyController');
-const auth = require('../middleware/auth');
-
-const router = express.Router();
-
-router.route('/')
-    .post(auth, createProperty)
-    .get(getProperties);
-
-router.route('/:id')
-    .get(getProperty)
-    .put(auth, updateProperty)
-    .delete(auth, deleteProperty);
-
-router.post('/:id/like', auth, likeProperty);
-
-module.exports = router;
-# Server Setup:
-const express = require('express');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const connectDB = require('./config/db');
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
-const propertyRoutes = require('./routes/propertyRoutes');
-
-dotenv.config();
-
-connectDB();
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-app.use('/api/users', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/properties', propertyRoutes);
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-# Start the Server:
-"scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+function App() {
+    return (
+        <Router>
+            <Header />
+            <Switch>
+                <Route path="/" component={Home} exact />
+                <Route path="/login" component={Login} />
+                <Route path="/register" component={Register} />
+                <Route path="/dashboard" component={Dashboard} />
+                <Route path="/profile" component={Profile} />
+                <Route path="/properties" component={PropertyList} exact />
+                <Route path="/properties/:id" component={PropertyDetails} />
+                <Route path="/add-property" component={AddProperty} />
+                <Route path="/edit-property/:id" component={EditProperty} />
+            </Switch>
+            <Footer />
+        </Router>
+    );
 }
-# Run the server:
-npm run dev
+
+export default App;
+# Home Component:
+import React from 'react';
+
+function Home() {
+    return (
+        <div>
+            <h1>Welcome to Rentify</h1>
+            <p>Your one-stop solution for finding rental properties.</p>
+        </div>
+    );
+}
+
+export default Home;
+# Header Component:
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+function Header() {
+    return (
+        <header>
+            <nav>
+                <ul>
+                    <li><Link to="/">Home</Link></li>
+                    <li><Link to="/properties">Properties</Link></li>
+                    <li><Link to="/add-property">Add Property</Link></li>
+                    <li><Link to="/profile">Profile</Link></li>
+                    <li><Link to="/login">Login</Link></li>
+                    <li><Link to="/register">Register</Link></li>
+                </ul>
+            </nav>
+        </header>
+    );
+}
+
+export default Header;
+# Footer Component:
+import React from 'react';
+
+function Footer() {
+    return (
+        <footer>
+            <p>&copy; 2024 Rentify. All rights reserved.</p>
+        </footer>
+    );
+}
+
+export default Footer;
+# Login Component:
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { login } from '../../api/api';
+
+function Login() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const history = useHistory();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+                            const { data } = await login({ email, password });
+                localStorage.setItem('token', data.token);
+                history.push('/dashboard');
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        return (
+            <div>
+                <h2>Login</h2>
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        );
+    }
+
+    export default Login;
+# Register Component:
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { register } from '../../api/api';
+
+function Register() {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [password, setPassword] = useState('');
+    const history = useHistory();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const { data } = await register({ firstName, lastName, email, phone, password });
+            localStorage.setItem('token', data.token);
+            history.push('/dashboard');
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
+    return (
+        <div>
+            <h2>Register</h2>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>First Name</label>
+                    <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Last Name</label>
+                    <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Phone Number</label>
+                    <input
+                        type="text"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    );
+}
+
+export default Register;
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { register } from '../../api/api';
+
+function Register() {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [password, setPassword] = useState('');
+    const history = useHistory();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const { data } = await register({ firstName, lastName, email, phone, password });
+            localStorage.setItem('token', data.token);
+            history.push('/dashboard');
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
+    return (
+        <div>
+            <h2>Register</h2>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>First Name</label>
+                    <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Last Name</label>
+                    <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Phone Number</label>
+                    <input
+                        type="text"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    );
+}
+
+export default Register;
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { register } from '../../api/api';
+
+function Register() {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [password, setPassword] = useState('');
+    const history = useHistory();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const { data } = await register({ firstName, lastName, email, phone, password });
+            localStorage.setItem('token', data.token);
+            history.push('/dashboard');
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
+    return (
+        <div>
+            <h2>Register</h2>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>First Name</label>
+                    <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Last Name</label>
+                    <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Phone Number</label>
+                    <input
+                        type="text"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    );
+}
+
+export default Register;
+
+**Dashboard Component:**
+
+    Create `src/components/Dashboard.js`:
+
+    ```js
+    import React, { useEffect, useState } from 'react';
+    import { getProfile } from '../api/api';
+
+    function Dashboard() {
+        const [user, setUser] = useState(null);
+
+        useEffect(() => {
+            const fetchProfile = async () => {
+                try {
+                    const { data } = await getProfile();
+                    setUser(data);
+                } catch (error) {
+                    console.error(error.message);
+                }
+            };
+
+            fetchProfile();
+        }, []);
+
+        return (
+            <div>
+                <h2>Dashboard</h2>
+                {user && (
+                    <div>
+                        <p>Welcome, {user.firstName} {user.lastName}</p>
+                        <p>Email: {user.email}</p>
+                        <p>Phone: {user.phone}</p>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    export default Dashboard;
+    # Profile Component:
+    import React, { useEffect, useState } from 'react';
+import { getProfile } from '../api/api';
+
+function Profile() {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const { data } = await getProfile();
+                setUser(data);
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        fetchProfile();
+    }, []);
+
+    return (
+        <div>
+            <h2>Profile</h2>
+            {user && (
+                <div>
+                    <p>First Name: {user.firstName}</p>
+                    <p>Last Name: {user.lastName}</p>
+                    <p>Email: {user.email}</p>
+                    <p>Phone: {user.phone}</p>
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default Profile;
+
+**Property List Component:**
+
+    Create `src/components/Properties/PropertyList.js`:
+
+    ```js
+    import React, { useEffect, useState } from 'react';
+    import { getProperties } from '../../api/api';
+    import { Link } from 'react-router-dom';
+
+    function PropertyList() {
+        const [properties, setProperties] = useState([]);
+
+        useEffect(() => {
+            const fetchProperties = async () => {
+                try {
+                    const { data } = await getProperties();
+                    setProperties(data);
+                } catch (error) {
+                    console.error(error.message);
+                }
+            };
+
+            fetchProperties();
+        }, []);
+
+        return (
+            <div>
+                <h2>Properties</h2>
+                <ul>
+                    {properties.map((property) => (
+                        <li key={property._id}>
+                            <Link to={`/properties/${property._id}`}>
+                                {property.place} - {property.area}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        );
+    }
+
+    export default PropertyList;
+ # Property Details Component:
+ import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { getProperty, likeProperty } from '../../api/api';
+
+function PropertyDetails() {
+    const { id } = useParams();
+    const [property, setProperty] = useState(null);
+
+    useEffect(() => {
+        const fetchProperty = async () => {
+            try {
+                const { data } = await getProperty(id);
+                setProperty(data);
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        fetchProperty();
+    }, [id]);
+
+    const handleLike = async () => {
+        try {
+            const { data } = await likeProperty(id);
+            setProperty(data);
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
+    return (
+        <div>
+            {property && (
+                <div>
+                    <h2>{property.place}</h2>
+                    <p>Area: {property.area}</p>
+                    <p>Bedrooms: {property.bedrooms}</p>
+                    <p>Bathrooms: {property.bathrooms}</p>
+                    <p>Nearby Hospitals: {property.nearbyHospitals}</p>
+                    <p>Nearby Colleges: {property.nearbyColleges}</p>
+                    <p>Likes: {property.likes}</p>
+                    <button onClick={handleLike}>Like</button>
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default PropertyDetails;
+
+ **Add Property Component:**
+
+    
+
+    ```js
+    import React, { useState } from 'react';
+    import { useHistory } from 'react-router-dom';
+    import { createProperty } from '../../api/api';
+
+    function AddProperty() {
+        const [place, setPlace] = useState('');
+        const [area, setArea] = useState('');
+        const [bedrooms, setBedrooms] = useState('');
+        const [bathrooms, setBathrooms] = useState('');
+        const [nearbyHospitals, setNearbyHospitals] = useState('');
+        const [nearbyColleges, setNearbyColleges] = useState('');
+        const history = useHistory();
+
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            try {
+                await createProperty({
+                    place,
+                    area,
+                    bedrooms,
+                    bathrooms,
+                    nearbyHospitals,
+                    nearbyColleges,
+                });
+                history.push('/properties');
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        return (
+            <div>
+                <h2>Add Property</h2>
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label>Place</label>
+                        <input
+                            type="text"
+                            value={place}
+                            onChange={(e) => setPlace(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Area</label>
+                        <input
+                            type="text"
+                            value={area}
+                            onChange={(e) => setArea(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Bedrooms</label>
+                        <input
+                            type="number"
+                            value={bedrooms}
+                            onChange={(e) => setBedrooms(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Bathrooms</label>
+                        <input
+                            type="number"
+                            value={bathrooms}
+                            onChange={(e) => setBathrooms(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Nearby Hospitals</label>
+                        <input
+                            type="text"
+                            value={nearbyHospitals}
+                            onChange={(e) => setNearbyHospitals(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Nearby Colleges</label>
+                        <input
+                            type="text"
+                            value={nearbyColleges}
+                            onChange={(e) => setNearbyColleges(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button type="submit">Add Property</button>
+                </form>
+            </div>
+        );
+    }
+
+    export default AddProperty;
+   #  Edit Property Component:
+   import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import { getProperty, updateProperty } from '../../api/api';
+
+function EditProperty() {
+    const { id } = useParams();
+    const [place, setPlace] = useState('');
+    const [area, setArea] = useState('');
+    const [bedrooms, setBedrooms] = useState('');
+    const [bathrooms, setBathrooms] = useState('');
+    const [nearbyHospitals, setNearbyHospitals] = useState('');
+    const [nearbyColleges, setNearbyColleges] = useState('');
+    const history = useHistory();
+
+    useEffect(() => {
+        const fetchProperty = async () => {
+            try {
+                const { data } = await getProperty(id);
+                setPlace(data.place);
+                setArea(data.area);
+                setBedrooms(data.bedrooms);
+                setBathrooms(data.bathrooms);
+                setNearbyHospitals(data.nearbyHospitals);
+                setNearbyColleges(data.nearbyColleges);
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        fetchProperty();
+    }, [id]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await updateProperty(id, {
+                place,
+                area,
+                bedrooms,
+                bathrooms,
+                nearbyHospitals,
+                nearbyColleges,
+            });
+            history.push(`/properties/${id}`);
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
+    return (
+        <div>
+            <h2>Edit Property</h2>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>Place</label>
+                    <input
+                        type="text"
+                        value={place}
+                        onChange={(e) => setPlace(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Area</label>
+                    <input
+                        type="text"
+                        value={area}
+                        onChange={(e) => setArea(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Bedrooms</label>
+                    <input
+                        type="number"
+                        value={bedrooms}
+                        onChange={(e) => setBedrooms(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Bathrooms</label>
+                    <input
+                        type="number"
+                        value={bathrooms}
+                        onChange={(e) => setBathrooms(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Nearby Hospitals</label>
+                    <input
+                        type="text"
+                        value={nearbyHospitals}
+                        onChange={(e) => setNearbyHospitals(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Nearby Colleges</label>
+                    <input
+                        type="text"
+                        value={nearbyColleges}
+                        onChange={(e) => setNearbyColleges(e.target.value)}
+                        required
+                    />
+                </div>
+                <button type="submit">Update Property</button>
+            </form>
+        </div>
+    );
+}
+
+export default EditProperty;
 
 
 
@@ -382,7 +834,5 @@ npm run dev
 
 
 
-
-
-
+   
 
